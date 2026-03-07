@@ -4,6 +4,53 @@ Terraform module for deploying Azure OpenAI Service with model deployments, priv
 
 ## Architecture
 
+```mermaid
+flowchart TB
+    Consumers["Consumers / Applications"]
+
+    subgraph APIM["API Management (Optional)"]
+        style APIM fill:#FF9900,color:#fff
+        RateLimiting["Rate Limiting"]
+        Auth["Authentication"]
+        Analytics["Usage Analytics"]
+    end
+
+    subgraph OpenAI["Azure OpenAI Service"]
+        style OpenAI fill:#0078D4,color:#fff
+        GPT4["GPT-4 Deployment"]
+        GPT35["GPT-3.5 Turbo"]
+        Embeddings["Embeddings Model"]
+        ContentFilter["Content Filtering"]
+    end
+
+    subgraph Networking["Private Networking"]
+        style Networking fill:#DD344C,color:#fff
+        PrivateEndpoint["Private Endpoint"]
+        DNSZone["Private DNS Zone"]
+    end
+
+    subgraph Identity["Managed Identity"]
+        style Identity fill:#8C4FFF,color:#fff
+        ManagedID["User-Assigned\nManaged Identity"]
+        RBAC["RBAC Access"]
+    end
+
+    subgraph Monitoring["Diagnostics"]
+        style Monitoring fill:#3F8624,color:#fff
+        LogAnalytics["Log Analytics Workspace"]
+    end
+
+    Consumers --> APIM
+    APIM --> OpenAI
+    OpenAI --> Networking
+    OpenAI --> Identity
+    OpenAI --> Monitoring
+    PrivateEndpoint --> DNSZone
+    ManagedID --> RBAC
+```
+
+### ASCII Diagram
+
 ```
                                  +---------------------+
                                  |    Consumers /      |
