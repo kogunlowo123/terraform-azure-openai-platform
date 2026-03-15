@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architecture -- terraform-azure-openai-platform</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b0c0b;color:#f5f2eb;font-family:'SF Mono','Cascadia Code','Fira Code',monospace;line-height:1.7;padding:0}
+a{color:#c8420a;text-decoration:none}a:hover{text-decoration:underline}
+.container{max-width:1200px;margin:0 auto;padding:2rem}
+h1,h2,h3{color:#f5f2eb;margin-bottom:1rem}
+h1{font-size:2rem;border-bottom:3px solid #c8420a;padding-bottom:.5rem;margin-bottom:2rem}
+h2{font-size:1.4rem;border-bottom:1px solid #333;padding-bottom:.4rem;margin-top:2.5rem}
+h3{font-size:1.1rem;color:#c8420a}
+.badge{display:inline-block;background:#0078d4;color:#fff;padding:4px 14px;border-radius:4px;font-size:.75rem;font-weight:700;margin-right:8px;letter-spacing:.5px}
+.badge-accent{background:#c8420a}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin:1.5rem 0}
+.card{background:#161816;border:1px solid #222;border-radius:8px;padding:1.2rem}
+.card h3{margin-bottom:.5rem;font-size:.95rem}
+.card p{font-size:.82rem;color:#bbb}
+.card .num{font-size:1.8rem;color:#c8420a;font-weight:700}
+.arch-diagram{background:#121312;border:1px solid #333;border-radius:8px;padding:2rem;margin:1.5rem 0;overflow-x:auto}
+.box{background:#1a1b1a;border:2px solid #c8420a;border-radius:6px;padding:.7rem 1.2rem;text-align:center;font-size:.8rem;min-width:110px;display:inline-block}
+.box.blue{border-color:#0078d4;color:#7ec8f0}
+.box.green{border-color:#3f8624;color:#7fba00}
+.box.red{border-color:#dd344c;color:#ff6b7a}
+.box.purple{border-color:#8c4fff;color:#b4a0ff}
+.box.orange{border-color:#ff9900;color:#ffb84d}
+.arrow{color:#555;font-size:1.2rem}
+.table-wrap{overflow-x:auto;margin:1rem 0}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{background:#1a1b1a;color:#c8420a;text-align:left;padding:.6rem .8rem;border-bottom:2px solid #333}
+td{padding:.5rem .8rem;border-bottom:1px solid #1e1f1e}
+tr:hover td{background:#161816}
+.checklist{list-style:none;padding:0}
+.checklist li{padding:.4rem 0;font-size:.85rem}
+.checklist li::before{content:"[ ] ";color:#c8420a;font-weight:700}
+.checklist li.done::before{content:"[x] ";color:#3f8624}
+code{background:#1a1b1a;padding:2px 6px;border-radius:3px;font-size:.82rem}
+pre{background:#121312;border:1px solid #333;border-radius:6px;padding:1rem;overflow-x:auto;font-size:.8rem;margin:1rem 0}
+.section{margin:2rem 0}
+.footer{border-top:1px solid #333;padding-top:1.5rem;margin-top:3rem;text-align:center;font-size:.75rem;color:#666}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+@media(max-width:768px){.grid-2{grid-template-columns:1fr}}
+.flow-row{display:flex;align-items:center;justify-content:center;gap:.4rem;margin:.5rem 0;flex-wrap:wrap}
+.flow-col{display:flex;flex-direction:column;align-items:center;gap:.4rem}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div style="margin-bottom:1rem">
+<span class="badge">Microsoft Azure</span>
+<span class="badge badge-accent">Terraform Module</span>
+<span class="badge" style="background:#333">AI / ML</span>
+</div>
+
+<h1>terraform-azure-openai-platform</h1>
+
+<div class="section">
+<h2>Executive Summary</h2>
+<p>Terraform module for deploying Azure OpenAI Service with multi-model deployments (GPT-4, GPT-3.5 Turbo, embeddings), private endpoint networking, content filtering policies, user-assigned managed identity with RBAC, and an optional Azure API Management (APIM) front-end for rate limiting, authentication, and usage analytics. Includes diagnostic settings for full request/response audit logging.</p>
+</div>
+
+<div class="section">
+<h2>Overview</h2>
+<div class="cards">
+<div class="card"><div class="num">7</div><h3>Resource Types</h3><p>Cognitive Account, Deployments, Identity, PE, APIM, API, Diagnostics</p></div>
+<div class="card"><div class="num">18</div><h3>Variables</h3><p>Configurable input parameters</p></div>
+<div class="card"><div class="num">5</div><h3>Outputs</h3><p>Endpoint, keys, deployment IDs, APIM URL</p></div>
+<div class="card"><div class="num">3</div><h3>Examples</h3><p>Basic, Advanced, Complete</p></div>
+</div>
+</div>
+
+<div class="section">
+<h2>Architecture Diagram</h2>
+<div class="arch-diagram">
+<div class="flow-col">
+<div class="flow-row">
+<div class="box purple">Consumers / Applications</div>
+</div>
+<div class="arrow" style="display:block;text-align:center">|</div>
+<div class="flow-row">
+<div style="border:2px solid #ff9900;border-radius:8px;padding:1rem;margin:.3rem">
+<div style="color:#ffb84d;font-weight:700;text-align:center;margin-bottom:.5rem">API Management (Optional)</div>
+<div class="flow-row">
+<div class="box orange">Rate Limiting</div>
+<div class="box orange">Authentication</div>
+<div class="box orange">Usage Analytics</div>
+</div>
+</div>
+</div>
+<div class="arrow" style="display:block;text-align:center">|</div>
+<div class="flow-row">
+<div style="border:2px solid #0078d4;border-radius:8px;padding:1.5rem;margin:.3rem">
+<div style="color:#7ec8f0;font-weight:700;text-align:center;margin-bottom:.5rem">Azure OpenAI Service (Cognitive Account)</div>
+<div class="flow-row">
+<div class="box blue">GPT-4<br>Deployment</div>
+<div class="box blue">GPT-3.5 Turbo<br>Deployment</div>
+<div class="box blue">Embeddings<br>Deployment</div>
+</div>
+<div class="flow-row" style="margin-top:.5rem">
+<div class="box red">Content Filter Policy</div>
+</div>
+</div>
+</div>
+<div class="flow-row" style="margin-top:1rem">
+<div style="border:2px solid #8c4fff;border-radius:8px;padding:1rem;margin:.3rem">
+<div style="color:#b4a0ff;font-weight:700;text-align:center;margin-bottom:.5rem">Identity</div>
+<div class="box purple">User-Assigned<br>Managed Identity</div>
+</div>
+<div style="border:2px solid #dd344c;border-radius:8px;padding:1rem;margin:.3rem">
+<div style="color:#ff6b7a;font-weight:700;text-align:center;margin-bottom:.5rem">Networking</div>
+<div class="flow-row">
+<div class="box red">Private Endpoint</div>
+<div class="box red">Private DNS Zone</div>
+</div>
+</div>
+<div style="border:2px solid #3f8624;border-radius:8px;padding:1rem;margin:.3rem">
+<div style="color:#7fba00;font-weight:700;text-align:center;margin-bottom:.5rem">Monitoring</div>
+<div class="box green">Log Analytics<br><small>Audit + Trace</small></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="section">
+<h2>Component Breakdown</h2>
+<div class="table-wrap">
+<table>
+<tr><th>Resource</th><th>Purpose</th><th>Optional</th></tr>
+<tr><td><code>azurerm_cognitive_account</code></td><td>Azure OpenAI Service with custom subdomain and network ACLs</td><td>No</td></tr>
+<tr><td><code>azurerm_cognitive_deployment</code></td><td>Model deployments (GPT-4, GPT-3.5, embeddings) with SKU capacity</td><td>Yes</td></tr>
+<tr><td><code>azurerm_user_assigned_identity</code></td><td>Managed identity for RBAC-based access (no API keys)</td><td>Yes</td></tr>
+<tr><td><code>azurerm_private_endpoint</code></td><td>VNet-isolated access with private DNS zone group</td><td>Yes</td></tr>
+<tr><td><code>azurerm_api_management</code></td><td>APIM gateway for rate limiting, auth, analytics</td><td>Yes</td></tr>
+<tr><td><code>azurerm_api_management_api</code></td><td>OpenAI API definition routed through APIM</td><td>Yes</td></tr>
+<tr><td><code>azurerm_monitor_diagnostic_setting</code></td><td>Audit, RequestResponse, and Trace logging</td><td>Yes</td></tr>
+</table>
+</div>
+</div>
+
+<div class="section">
+<h2>Data Flow</h2>
+<div class="arch-diagram">
+<div class="flow-row">
+<div class="box purple">Client App</div>
+<div class="arrow">&rarr;</div>
+<div class="box orange">APIM Gateway<br><small>Rate Limit + Auth</small></div>
+<div class="arrow">&rarr;</div>
+<div class="box red">Private Endpoint</div>
+<div class="arrow">&rarr;</div>
+<div class="box blue">OpenAI Service</div>
+<div class="arrow">&rarr;</div>
+<div class="box blue">Model Deployment</div>
+<div class="arrow">&rarr;</div>
+<div class="box green">Log Analytics</div>
+</div>
+</div>
+<p style="font-size:.85rem;color:#bbb;margin-top:.5rem"><strong>1.</strong> Client sends request to APIM gateway URL. <strong>2.</strong> APIM applies rate limiting, authentication, and request transformation. <strong>3.</strong> Traffic routes through private endpoint to OpenAI service. <strong>4.</strong> Content filter evaluates request before model processing. <strong>5.</strong> Model deployment generates response. <strong>6.</strong> All requests logged to Log Analytics (Audit + RequestResponse + Trace).</p>
+</div>
+
+<div class="section">
+<h2>Security Controls</h2>
+<div class="grid-2">
+<div class="card">
+<h3>Network Security</h3>
+<p>- Private endpoint (public access auto-disabled)<br>- Private DNS zone integration<br>- Network ACLs with default Deny<br>- IP and VNet rule allowlists</p>
+</div>
+<div class="card">
+<h3>Identity &amp; Access</h3>
+<p>- User-assigned managed identity<br>- RBAC-based access (no shared keys)<br>- APIM subscription key authentication<br>- SystemAssigned identity on APIM</p>
+</div>
+<div class="card">
+<h3>Content Safety</h3>
+<p>- Content filter policies on deployments<br>- Request/response audit logging<br>- Trace-level diagnostics available</p>
+</div>
+<div class="card">
+<h3>API Governance</h3>
+<p>- Rate limiting via APIM policies<br>- Usage analytics and reporting<br>- Request routing and transformation<br>- Subscription-required API access</p>
+</div>
+</div>
+</div>
+
+<div class="section">
+<h2>Industry Adaptation</h2>
+<div class="cards">
+<div class="card"><h3>Enterprise AI</h3><p>APIM front-end for multi-team usage metering, managed identity auth, private endpoint for data isolation</p></div>
+<div class="card"><h3>Healthcare</h3><p>Content filtering for sensitive data, private endpoint only, full audit logging, no public network access</p></div>
+<div class="card"><h3>Customer Service</h3><p>GPT-3.5 for high-volume chat, GPT-4 for complex queries, rate limiting per application, usage analytics</p></div>
+<div class="card"><h3>Development Platforms</h3><p>Embeddings model for RAG, multiple model deployments, APIM for developer portal and API key management</p></div>
+</div>
+</div>
+
+<div class="section">
+<h2>Production Readiness Checklist</h2>
+<ul class="checklist">
+<li class="done">Private endpoint enabled (public access disabled)</li>
+<li class="done">Managed identity for RBAC access</li>
+<li class="done">Content filter policy applied to deployments</li>
+<li class="done">Diagnostic settings with Audit + RequestResponse logging</li>
+<li class="done">Network ACLs with default Deny</li>
+<li>Configure APIM for rate limiting and auth</li>
+<li>Set appropriate SKU capacity per model deployment</li>
+<li>Monitor token usage and throttling metrics</li>
+<li>Test failover with regional deployments</li>
+<li>Review content filter sensitivity levels</li>
+</ul>
+</div>
+
+<div class="section">
+<h2>Configuration Reference</h2>
+<div class="table-wrap">
+<table>
+<tr><th>Variable</th><th>Type</th><th>Default</th><th>Description</th></tr>
+<tr><td><code>name</code></td><td>string</td><td>--</td><td>Cognitive Services account name</td></tr>
+<tr><td><code>custom_subdomain_name</code></td><td>string</td><td>--</td><td>Custom subdomain for the service</td></tr>
+<tr><td><code>sku_name</code></td><td>string</td><td>S0</td><td>Cognitive Services SKU</td></tr>
+<tr><td><code>model_deployments</code></td><td>map(object)</td><td>{}</td><td>Model deployments with name/version/capacity</td></tr>
+<tr><td><code>enable_private_endpoint</code></td><td>bool</td><td>true</td><td>Create private endpoint</td></tr>
+<tr><td><code>enable_managed_identity</code></td><td>bool</td><td>true</td><td>Create managed identity</td></tr>
+<tr><td><code>enable_apim</code></td><td>bool</td><td>false</td><td>Deploy APIM front-end</td></tr>
+<tr><td><code>content_filter_name</code></td><td>string</td><td>null</td><td>Content filter policy name</td></tr>
+<tr><td><code>enable_diagnostics</code></td><td>bool</td><td>true</td><td>Enable diagnostic settings</td></tr>
+</table>
+</div>
+</div>
+
+<div class="section">
+<h2>Deployment</h2>
+<pre>
+terraform init
+terraform plan -var-file="openai.tfvars"
+terraform apply -var-file="openai.tfvars"
+
+# Verify deployment
+az cognitiveservices account show --name my-openai-service --resource-group my-resource-group
+az cognitiveservices account deployment list --name my-openai-service --resource-group my-resource-group
+</pre>
+</div>
+
+<div class="section">
+<h2>Links</h2>
+<p>
+<a href="https://learn.microsoft.com/en-us/azure/ai-services/openai/">Azure OpenAI Documentation</a> |
+<a href="https://learn.microsoft.com/en-us/azure/api-management/">APIM Documentation</a> |
+<a href="../examples/basic/">Basic Example</a> |
+<a href="../examples/complete/">Complete Example</a>
+</p>
+</div>
+
+<div class="footer">
+<p>terraform-azure-openai-platform &mdash; Architecture Document</p>
+<p>Generated on 2026-03-15 &bull; Terraform &ge; 1.5.0 &bull; AzureRM &ge; 3.80.0</p>
+<p style="margin-top:.5rem"><span class="badge">Microsoft Azure</span> Verified Module Architecture</p>
+</div>
+
+</div>
+</body>
+</html>
