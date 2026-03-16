@@ -1,6 +1,3 @@
-# -------------------------------------------------------
-# Azure OpenAI Cognitive Services Account
-# -------------------------------------------------------
 resource "azurerm_cognitive_account" "this" {
   name                  = var.name
   location              = var.location
@@ -40,12 +37,9 @@ resource "azurerm_cognitive_account" "this" {
 
   public_network_access_enabled = var.enable_private_endpoint ? false : true
 
-  tags = local.tags
+  tags = var.tags
 }
 
-# -------------------------------------------------------
-# Model Deployments
-# -------------------------------------------------------
 resource "azurerm_cognitive_deployment" "this" {
   for_each = var.model_deployments
 
@@ -71,26 +65,20 @@ resource "azurerm_cognitive_deployment" "this" {
   }
 }
 
-# -------------------------------------------------------
-# User-Assigned Managed Identity
-# -------------------------------------------------------
 resource "azurerm_user_assigned_identity" "this" {
   count = var.enable_managed_identity ? 1 : 0
 
-  name                = local.managed_identity_name
+  name                = "${var.name}-identity"
   location            = var.location
   resource_group_name = var.resource_group_name
 
-  tags = local.tags
+  tags = var.tags
 }
 
-# -------------------------------------------------------
-# Private Endpoint
-# -------------------------------------------------------
 resource "azurerm_private_endpoint" "this" {
   count = var.enable_private_endpoint ? 1 : 0
 
-  name                = local.private_endpoint_name
+  name                = "${var.name}-pe"
   location            = var.location
   resource_group_name = var.resource_group_name
   subnet_id           = var.private_endpoint_subnet_id
@@ -110,12 +98,9 @@ resource "azurerm_private_endpoint" "this" {
     }
   }
 
-  tags = local.tags
+  tags = var.tags
 }
 
-# -------------------------------------------------------
-# Azure API Management (Conditional)
-# -------------------------------------------------------
 resource "azurerm_api_management" "this" {
   count = var.enable_apim ? 1 : 0
 
@@ -131,7 +116,7 @@ resource "azurerm_api_management" "this" {
     type = "SystemAssigned"
   }
 
-  tags = local.tags
+  tags = var.tags
 }
 
 resource "azurerm_api_management_api" "openai" {
@@ -144,14 +129,11 @@ resource "azurerm_api_management_api" "openai" {
   display_name        = "Azure OpenAI API"
   path                = "openai"
   protocols           = ["https"]
-  service_url         = local.openai_api_url
+  service_url         = "${azurerm_cognitive_account.this.endpoint}openai/"
 
   subscription_required = true
 }
 
-# -------------------------------------------------------
-# Diagnostic Settings
-# -------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "this" {
   count = var.enable_diagnostics && var.log_analytics_workspace_id != null ? 1 : 0
 

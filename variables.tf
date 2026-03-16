@@ -4,7 +4,7 @@ variable "name" {
 }
 
 variable "resource_group_name" {
-  description = "The name of the resource group in which to create the resources."
+  description = "The name of the resource group for all resources."
   type        = string
 }
 
@@ -27,10 +27,10 @@ variable "custom_subdomain_name" {
 variable "model_deployments" {
   description = "Map of model deployments to create."
   type = map(object({
-    model_name   = string
+    model_name    = string
     model_version = string
-    sku_name     = string
-    sku_capacity = number
+    sku_name      = string
+    sku_capacity  = number
   }))
   default = {}
 }
@@ -54,7 +54,7 @@ variable "private_dns_zone_id" {
 }
 
 variable "enable_managed_identity" {
-  description = "Whether to create a user-assigned managed identity for the OpenAI service."
+  description = "Whether to create a user-assigned managed identity."
   type        = bool
   default     = true
 }
@@ -74,7 +74,7 @@ variable "network_acls" {
 }
 
 variable "enable_apim" {
-  description = "Whether to create an Azure API Management instance as a front-end for the OpenAI service."
+  description = "Whether to create an API Management instance for the OpenAI service."
   type        = bool
   default     = false
 }
@@ -122,7 +122,7 @@ variable "content_filter_name" {
 }
 
 variable "tags" {
-  description = "A map of tags to apply to all resources."
+  description = "Tags to apply to all resources."
   type        = map(string)
   default     = {}
 }
