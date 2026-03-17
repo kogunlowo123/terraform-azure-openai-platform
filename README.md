@@ -1,3 +1,9 @@
+![Terraform](https://img.shields.io/badge/Terraform-%3E%3D1.5-blueviolet?logo=terraform)
+![Azure](https://img.shields.io/badge/Azure-0078D4?logo=microsoftazure&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green)
+![CI](https://img.shields.io/github/actions/workflow/status/kogunlowo123/terraform-azure-openai-platform/terraform-ci.yml?label=CI)
+![GitHub release](https://img.shields.io/github/v/release/kogunlowo123/terraform-azure-openai-platform)
+
 # terraform-azure-openai-platform
 
 Terraform module for deploying Azure OpenAI Service with model deployments, private networking, content filtering, managed identity, and an optional API Management (APIM) front-end.
